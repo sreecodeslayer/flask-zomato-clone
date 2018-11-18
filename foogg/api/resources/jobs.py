@@ -13,4 +13,6 @@ class JobsResource(ManagerResources):
 
 class JobResource(ManagerResources):
     def get(self, jid):
-        pass
+        schema = JobSchema()
+        job = Jobs.objects.get_or_404(id=jid)
+        return schema.jsonify(job)
