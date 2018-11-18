@@ -1,7 +1,7 @@
 from flask import Flask
 
 from foogg import auth, api
-from foogg.extensions import db, jwt
+from foogg.extensions import db, jwt, socketio
 from .helpers import loadconf
 
 
@@ -38,6 +38,7 @@ def configure_extensions(app, cli):
     '''
     db.init_app(app)
     jwt.init_app(app)
+    socketio.init_app(app)
 
 
 def register_blueprints(app):
