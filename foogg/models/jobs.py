@@ -14,3 +14,7 @@ class Jobs(db.Document):
     priority = db.StringField(max_length=6, required=True)
     created_on = db.DateTimeField(default=datetime.utcnow)
     created_by = db.ReferenceField(Users)
+
+    meta = {
+        'indexes': ['priority', 'created_on']
+    }
