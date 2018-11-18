@@ -7,5 +7,5 @@ from flask_socketio import SocketIO
 db = MongoEngine()
 jwt = JWTManager()
 ma = Marshmallow()
-socketio = SocketIO()
+socketio = SocketIO(engineio_logger=True)
 pwd_context = pbkdf2_sha256
