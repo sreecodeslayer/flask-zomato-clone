@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 
 class Development:
@@ -7,6 +8,7 @@ class Development:
     HOST = os.getenv('MONGO_HOST', 'localhost')
     PORT = os.getenv('MONGO_PORT', 27017)
     DB = os.getenv('MONGO_DB', 'FOOGG')
+    JWT_ACCESS_TOKEN_EXPIRES = False
 
     MONGODB_SETTINGS = [{
         'db': DB,
@@ -21,6 +23,7 @@ class Production(Development):
     HOST = os.getenv('MONGO_HOST', 'localhost')
     PORT = os.getenv('MONGO_PORT', 27017)
     DB = os.getenv('MONGO_DB', 'FOOGG')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=14)
 
     MONGODB_SETTINGS = [{
         'db': DB,
