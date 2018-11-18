@@ -5,7 +5,8 @@ from foogg.api.resources import (
     UserResource,
     UsersResource,
     JobsResource,
-    JobResource
+    JobResource,
+    JobStatusResource
 )
 
 
@@ -18,3 +19,4 @@ api.add_resource(UsersResource, '/users')
 
 api.add_resource(JobResource, '/jobs/<jid>')
 api.add_resource(JobsResource, '/jobs')
+api.add_resource(JobStatusResource, '/jobs/<jid>/status')

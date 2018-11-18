@@ -4,5 +4,6 @@ from .user import (
 )
 from .jobs import (
     JobResource,
-    JobsResource
+    JobsResource,
+    JobStatusResource
 )
