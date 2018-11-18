@@ -1,5 +1,4 @@
 from flask import Flask
-
 from foogg import auth, api
 from foogg.extensions import db, jwt, socketio
 from .helpers import loadconf
@@ -44,5 +43,8 @@ def configure_extensions(app, cli):
 def register_blueprints(app):
     '''register all blueprints for application
     '''
+    # Register socketio events
+    from . import events
+
     app.register_blueprint(auth.views.blueprint)
     app.register_blueprint(api.views.blueprint)
