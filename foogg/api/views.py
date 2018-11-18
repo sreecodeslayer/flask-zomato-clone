@@ -3,7 +3,9 @@ from flask_restful import Api
 
 from foogg.api.resources import (
     UserResource,
-    UsersResource
+    UsersResource,
+    JobsResource,
+    JobResource
 )
 
 
@@ -13,3 +15,6 @@ api = Api(blueprint)
 
 api.add_resource(UserResource, '/users/<uid>')
 api.add_resource(UsersResource, '/users')
+
+api.add_resource(JobResource, '/jobs/<jid>')
+api.add_resource(JobsResource, '/jobs')
