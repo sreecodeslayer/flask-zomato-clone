@@ -7,9 +7,11 @@ class Users(db.Document):
     username = db.StringField(required=True, unique=True)
     email = db.EmailField(unique=True)
     passwd_digest = db.StringField()
+    roles = db.ListField(default=['manager'])
+    joined_on = db.DateTimeField(default=datetime.utcnow)
 
     meta = {
-        'indexes': ['username', 'email']
+        'indexes': ['username', 'email', 'joined_on']
     }
 
     def __init__(self, **kwargs):
