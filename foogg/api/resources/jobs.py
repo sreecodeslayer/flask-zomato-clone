@@ -1,7 +1,8 @@
 from .base import ManagerResources
 from ...schemas import JobSchema
-from ...models import Jobs
+from ...models import Jobs, History
 from ...helpers import paginate
+from ...log import logger
 from flask import request, jsonify, make_response
 from flask_jwt_extended import get_current_user
 
@@ -22,6 +23,7 @@ class JobsResource(ManagerResources):
             return make_response(
                 jsonify(errors=errors), 422
             )
+        job.history.append(History())
         job.created_by = get_current_user()
         job.save()
         return schema.jsonify(job)

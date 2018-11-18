@@ -1,2 +1,2 @@
 from .users import Users
-from .jobs import Jobs
+from .jobs import Jobs, History
