@@ -1,3 +1,4 @@
+import requests
 import pika
 errs = (
     pika.exceptions.ConnectionClosed,
@@ -15,11 +16,13 @@ class RmqHandler:
     '''
 
     def __init__(self,
-                 name, ip='localhost', pwd='guest',
+                 name, ip='127.0.0.1', pwd='guest',
                  user='guest', port=5672, prefetch_count=1):
 
         self.QUEUE = name
         self.ROUTING_KEY = name
+        self.URI = f'http://{user}:{pwd}@{ip}:15672/api/queues/%2f/{name}'
+
         self.prefetch_count = prefetch_count
         pika_creds = pika.PlainCredentials(user, pwd)
         self._params = pika.connection.ConnectionParameters(
@@ -30,6 +33,12 @@ class RmqHandler:
         self._conn = None
         self._channel = None
         self.connect()
+
+    @property
+    def count(self):
+        resp = requests.get(self.URI)
+        resp = resp.json()
+        return resp.get('messages', 0)
 
     def connect(self):
         if not self._conn or self._conn.is_closed:

@@ -1,5 +1,6 @@
 from .paginator import paginate
 from ..config import configuration
+from .rmqhandler import RmqHandler
 import os
 
 
