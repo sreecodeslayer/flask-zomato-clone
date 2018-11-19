@@ -36,7 +36,8 @@ def login():
 
     ret = {
         'access_token': access_token,
-        'refresh_token': refresh_token
+        'refresh_token': refresh_token,
+        'roles': user.roles
     }
     return jsonify(ret), 200
 
