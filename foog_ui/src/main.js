@@ -4,6 +4,8 @@ import router from './router'
 import VueAuthenticate from 'vue-authenticate'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import VueSocketIO from 'vue-socket.io'
+
 import './plugins/element.js'
 let API_ENDPOINT = process.env.VUE_APP_API
 console.log(API_ENDPOINT)
@@ -16,6 +18,11 @@ Vue.use(VueAuthenticate, {
   tokenName: 'access_token',
   storageType: 'cookieStorage'
 })
+
+Vue.use(new VueSocketIO({
+  debug: true,
+  connection: API_ENDPOINT
+}))
 
 Vue.config.productionTip = false
 
