@@ -18,16 +18,16 @@ export default {
   },
   sockets: {
     connect () {
-      console.log('connected')
     },
     disconnect () {
-      console.log('disconnected')
     },
     status (data) {
       this.$notify({
         title: data.title,
         message: this.$createElement('i', { style: 'color: teal' }, data.message)
       })
+    },
+    realtime (data) {
     }
   },
   created () {
