@@ -1,4 +1,4 @@
-from .base import ManagerResources, JWTResource
+from .base import ManagerResources, JWTResource, DeliveryValetResources
 from ...schemas import JobSchema
 from ...models import Jobs, History
 from ...helpers import paginate
@@ -45,6 +45,18 @@ class JobResource(ManagerResources):
         job = Jobs.objects.get_or_404(id=jid)
         job.delete()
         return jsonify(message='Job removed')
+
+
+class ValetDeliveriesResource(DeliveryValetResources):
+    def get(self):
+        schema = JobSchema(many=True)
+        previous = ['completed', 'declined', 'cancelled']
+        jobs = Jobs.objects(
+            delivered_by=get_current_user(), status__in=previos)
+        by_status = request.args.get('status')
+        if by_status:
+            jobs = jobs.filter(status=by_status)
+        return paginate(jobs, schema)
 
 
 class JobStatusResource(JWTResource):

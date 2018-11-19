@@ -6,7 +6,8 @@ from foogg.api.resources import (
     UsersResource,
     JobsResource,
     JobResource,
-    JobStatusResource
+    JobStatusResource,
+    ValetDeliveriesResource
 )
 
 
@@ -20,3 +21,5 @@ api.add_resource(UsersResource, '/users')
 api.add_resource(JobResource, '/jobs/<jid>')
 api.add_resource(JobsResource, '/jobs')
 api.add_resource(JobStatusResource, '/jobs/<jid>/status')
+
+api.add_resource(ValetDeliveriesResource, '/deliveries')
