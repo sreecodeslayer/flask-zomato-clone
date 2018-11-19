@@ -11,7 +11,27 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  data () {
+    return {
+    }
+  },
+  sockets: {
+    connect () {
+      console.log('connected')
+    },
+    disconnect () {
+      console.log('disconnected')
+    },
+    status (data) {
+      this.$notify({
+        title: data.title,
+        message: this.$createElement('i', { style: 'color: teal' }, data.message)
+      })
+    }
+  },
+  created () {
+  }
 }
 </script>
 

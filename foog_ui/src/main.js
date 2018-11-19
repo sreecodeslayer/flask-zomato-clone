@@ -21,7 +21,7 @@ Vue.use(VueAuthenticate, {
 
 Vue.use(new VueSocketIO({
   debug: true,
-  connection: API_ENDPOINT
+  connection: API_ENDPOINT + '/updates'
 }))
 
 Vue.config.productionTip = false
