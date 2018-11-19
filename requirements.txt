@@ -44,4 +44,5 @@ mongoengine == 0.16.1
 passlib == 1.7.1
 
 # foogg/helpers/rmqhandler.py: 1
+requests == 2.20.1
 pika == 0.12.0

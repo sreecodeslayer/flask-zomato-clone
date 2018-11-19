@@ -2,6 +2,7 @@ from .base import ManagerResources, JWTResource, DeliveryValetResources
 from ...schemas import JobSchema
 from ...models import Jobs, History
 from ...helpers import paginate
+from ...extensions import rmq
 from ...log import logger
 from flask import request, jsonify, make_response
 from flask_jwt_extended import get_current_user
