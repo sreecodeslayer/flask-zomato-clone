@@ -25,6 +25,22 @@ export default {
 
       activeIndex: '1'
     }
+  },
+  sockets: {
+    connect () {
+    },
+    disconnect () {
+    },
+    status (data) {
+      this.$notify({
+        title: data.title,
+        message: this.$createElement('i', { style: 'color: teal' }, data.message)
+      })
+    },
+    realtime (data) {
+    }
+  },
+  created () {
   }
 }
 </script>
