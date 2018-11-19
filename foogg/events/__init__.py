@@ -13,9 +13,11 @@ def connected():
     logger.debug('Client [%s] connected for updates' % (request.sid))
     join_room(ROOM)
     emit(
-        'status', {
-            'msg': request.sid + ' has subscribed to real time updates.'},
-        room=ROOM
+        'status', {'title': 'Welcome!',
+                   'message': 'You are now connected to real time updates'},
+        room=ROOM,
+        json=True,
+        namespace='/updates'
     )
 
 
