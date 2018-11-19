@@ -15,12 +15,11 @@ class RmqHandler:
     from queue in one request
     '''
 
-    def __init__(self,
-                 name, ip='127.0.0.1', pwd='guest',
-                 user='guest', port=5672, prefetch_count=1):
+    def __init__(
+            self, name, ip='127.0.0.1', pwd='guest',
+            user='guest', port=5672, prefetch_count=1):
 
         self.QUEUE = name
-        self.ROUTING_KEY = name
         self.URI = f'http://{user}:{pwd}@{ip}:15672/api/queues/%2f/{name}'
 
         self.prefetch_count = prefetch_count

@@ -30,8 +30,7 @@ class JobsResource(ManagerResources):
         job.save()
         queue_string = str(job.id)
         # Insert it into queue
-
-        # Publish to websocket room
+        rmq.publish_job(queue_string)
 
         return schema.jsonify(job)
 
