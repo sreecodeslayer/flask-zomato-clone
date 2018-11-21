@@ -16,11 +16,10 @@
 </template>
 
 <script>
-import Home from '@/views/Home'
 import NavBar from '@/components/NavBar'
 export default {
   name: 'app',
-  components: { NavBar, Home },
+  components: { NavBar },
   data () {
     return {
 

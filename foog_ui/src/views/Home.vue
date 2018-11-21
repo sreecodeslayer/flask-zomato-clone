@@ -1,4 +1,5 @@
 <template>
+  <div id="home-wrapper"></div>
 </template>
 
 <script>
