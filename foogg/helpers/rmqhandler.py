@@ -16,8 +16,8 @@ class RmqHandler:
     '''
 
     def __init__(
-            self, name, ip='127.0.0.1', pwd='guest',
-            user='guest', port=5672, prefetch_count=1):
+            self, name, ip='192.168.10.109', pwd='scr@pyrunn3r',
+            user='scrapyrunner', port=5672, prefetch_count=1):
 
         self.QUEUE = name
         self.URI = f'http://{user}:{pwd}@{ip}:15672/api/queues/%2f/{name}'
@@ -40,20 +40,24 @@ class RmqHandler:
         return resp.get('messages', 0)
 
     def connect(self):
+        args = {'x-max-priority': 3}
         if not self._conn or self._conn.is_closed:
             self._conn = pika.BlockingConnection(self._params)
             self._channel = self._conn.channel()
             self._channel.basic_qos(prefetch_count=self.prefetch_count)
             self._channel.queue_declare(
                 self.QUEUE,
-                durable=True
+                durable=True,
+                arguments=args
             )
 
-    def _publish(self, job):
+    def _publish(self, job, priority):
+        props = pika.BasicProperties(priority=priority)
         self._channel.basic_publish(
-            '',
-            self.QUEUE,
-            job
+            exchange='',
+            routing_key=self.QUEUE,
+            body=job,
+            properties=props
         )
 
     def seek_job(self):
@@ -80,14 +84,14 @@ class RmqHandler:
             job = None
         return job
 
-    def publish_job(self, job):
+    def publish_job(self, job, priority=0):
         """Publish job, will automatically reconnect if necessary."""
 
         try:
-            self._publish(job)
+            self._publish(job, priority)
         except:
             self.connect()
-            self._publish(job)
+            self._publish(job, priority)
 
     def close(self):
         if self._conn and self._conn.is_open:
