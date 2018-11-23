@@ -99,7 +99,7 @@ class JobStatusResource(JWTResource):
             # verify user is a manager
             if not curr_user.is_manager:
                 return make_response(
-                    jsonify(message='Not auhorized to cancel jobs'),
+                    jsonify(message='Not authorized to cancel jobs'),
                     401
                 )
         # get prioratised job here
