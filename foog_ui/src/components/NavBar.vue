@@ -1,23 +1,52 @@
 <template>
-  <el-header>
-    <el-menu :default-active="activeIndex"  text-color="grey" router mode="horizontal"  active-text-color="teal">
-      <el-menu-item index="1" :route="{path:'/'}">Home</el-menu-item>
-      <el-submenu index="2">
-        <template slot="title">Tasks</template>
-        <el-menu-item index="2-1" :route="{path:'/tasks/new'}">New</el-menu-item>
-        <el-menu-item index="2-2" :route="{path:'/tasks'}">All Tasks</el-menu-item>
-      </el-submenu>
-    </el-menu>
-  </el-header>
+  <el-row style="background-color: teal">
+    <el-col :span="24">
+      <el-header style="padding: 0">
+        <el-row>
+          <el-col :span="21">
+            <!-- Navs -->
+            <el-menu :default-active="activeIndex" background-color="teal" text-color="white" router mode="horizontal"  active-text-color="yellow" style="border-bottom: none;background-color: transparent;">
+              <el-menu-item index="1" :route="{path:'/'}">Home</el-menu-item>
+              <el-submenu index="2">
+                <template slot="title">Tasks</template>
+                <el-menu-item index="2-1" :route="{path:'/tasks/new'}">New</el-menu-item>
+                <el-menu-item index="2-2" :route="{path:'/tasks'}">All Tasks</el-menu-item>
+              </el-submenu>
+            </el-menu>
+          </el-col>
+          <el-col :span="3" style="height: 60px">
+            <!-- Notification/Logout buttons -->
+            <el-menu :default-active="activeIndex"  text-color="white" router mode="horizontal"  active-text-color="yellow" style="border-bottom: none;background-color: transparent;">
+              <el-menu-item index="3" :route="{path:'/'}">
+                <el-badge is-dot class="item" v-if="hasTasks"><i class="el-icon-bell" style="color: yellow" /></el-badge>
+                <i v-else class="el-icon-bell" style="color: white" />
+              </el-menu-item>
+              <el-menu-item index="4"><i class="el-icon-d-arrow-right"  style="color: white" @click="$auth.logout()"/></el-menu-item>
+            </el-menu>
+          </el-col>
+        </el-row>
+      </el-header>
+    </el-col>
+  </el-row>
 </template>
-<style></style>
+<style>
+  .el-badge__content.is-fixed.is-dot {
+    margin-top: 10px
+  }
+
+</style>
 <script>
 export default {
   name: 'NavBar',
   data () {
     return {
-
-      activeIndex: '1'
+      activeIndex: '1',
+      hasTasks: false
+    }
+  },
+  sockets: {
+    realtime (data) {
+      this.hasTasks = data.status
     }
   }
 }
