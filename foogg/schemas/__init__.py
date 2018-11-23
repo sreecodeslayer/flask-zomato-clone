@@ -1,2 +1,2 @@
 from .user import UserSchema
-from .jobs import JobSchema
+from .jobs import JobSchema, PRIORITIES

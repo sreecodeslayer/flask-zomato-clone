@@ -17,18 +17,24 @@ def background_thread():
     """Check if the queue is empty here, send broadcast if not"""
     count = 0
     while True:
-        socketio.sleep(15)
+        socketio.sleep(10)
         count = rmq.count
-        logger.debug(f'{count} tasks are in queue')
-        if count:
-            socketio.emit(
-                'realtime',
-                {
-                    'message': 'A new task is available'
-                },
-                json=True,
-                namespace='/updates'
-            )
+        status = False
+        msg = 'No tasks for you!'
+        if count > 0:
+            logger.debug(f'{count} tasks are in queue, send realtime update')
+            msg = 'A new task is available'
+            status = True
+        socketio.emit(
+            'realtime',
+            {
+                'message': msg,
+                'status': status
+            },
+            json=True,
+            room=ROOM,
+            namespace='/updates'
+        )
 
 
 with lock:

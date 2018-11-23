@@ -7,15 +7,16 @@ from ..models import Jobs, History
 from marshmallow.exceptions import ValidationError
 from marshmallow import post_load
 
-PRIORITIES = ['low', 'medium', 'high']
+PRIORITIES = {'low': 0, 'medium': 1, 'high': 2}
 
 
 def validate_choice(value):
-    if value in PRIORITIES:
+    keys = PRIORITIES.keys()
+    if value in keys:
         return True
     else:
         raise ValidationError(
-            f'Priority can be any of {PRIORITIES}')
+            f'Priority can be any of {keys}')
 
 
 class HistorySchema(ma.Schema):

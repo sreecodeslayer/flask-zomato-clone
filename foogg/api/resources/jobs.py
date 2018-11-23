@@ -1,8 +1,8 @@
 from .base import ManagerResources, JWTResource, DeliveryValetResources
-from ...schemas import JobSchema
+from ...schemas import JobSchema, PRIORITIES
 from ...models import Jobs, History
 from ...helpers import paginate
-from ...extensions import rmq
+from ...extensions import rmq, socketio
 from ...log import logger
 from flask import request, jsonify, make_response
 from flask_jwt_extended import get_current_user
@@ -30,8 +30,19 @@ class JobsResource(ManagerResources):
         job.save()
         queue_string = str(job.id)
         # Insert it into queue
-        rmq.publish_job(queue_string)
+        rmq.publish_job(queue_string, PRIORITIES.get(job.priority))
+        # Send the notification as it need not wait for the beat
 
+        socketio.emit(
+            'realtime',
+            {
+                'message': 'A new task is available',
+                'status': True
+            },
+            json=True,
+            room='realtime_updates',
+            namespace='/updates'
+        )
         return schema.jsonify(job)
 
 
