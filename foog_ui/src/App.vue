@@ -2,7 +2,7 @@
  <div id="app" v-if="!$route.meta.public">
   <!-- Main pages -->
   <el-container id="main-container" style="height: calc(92vh);">
-  <nav-bar/>
+    <nav-bar/>
     <el-main>
       <router-view/>
     </el-main>
@@ -24,20 +24,6 @@ export default {
     return {
 
       activeIndex: '1'
-    }
-  },
-  sockets: {
-    connect () {
-    },
-    disconnect () {
-    },
-    status (data) {
-      this.$notify({
-        title: data.title,
-        message: this.$createElement('i', { style: 'color: teal' }, data.message)
-      })
-    },
-    realtime (data) {
     }
   },
   created () {
