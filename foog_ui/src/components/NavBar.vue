@@ -7,11 +7,7 @@
             <!-- Navs -->
             <el-menu :default-active="activeIndex" background-color="teal" text-color="white" router mode="horizontal"  active-text-color="yellow" style="border-bottom: none;background-color: transparent;">
               <el-menu-item index="1" :route="{path:'/'}">Home</el-menu-item>
-              <el-submenu index="2">
-                <template slot="title">Tasks</template>
-                <el-menu-item index="2-1" :route="{path:'/tasks/new'}">New</el-menu-item>
-                <el-menu-item index="2-2" :route="{path:'/tasks'}">All Tasks</el-menu-item>
-              </el-submenu>
+              <el-menu-item index="2" :route="{path:'/tasks'}">Tasks</el-menu-item>
             </el-menu>
           </el-col>
           <el-col :span="3" style="height: 60px">
