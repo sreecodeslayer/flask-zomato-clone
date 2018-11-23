@@ -39,6 +39,17 @@ def configure_extensions(app, cli):
     jwt.init_app(app)
     socketio.init_app(app)
 
+    # Configue cors for localhost
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin',
+                             '*')
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET,OPTIONS,DELETE,PATCH,POST,DELETE')
+        return response
+
 
 def register_blueprints(app):
     '''register all blueprints for application
