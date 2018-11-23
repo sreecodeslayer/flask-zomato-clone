@@ -82,25 +82,25 @@ class JobStatusResource(JWTResource):
         schema = JobSchema(partial=True)
         job = Jobs.objects.get_or_404(id=jid)
         status = request.json.get('status')
-        if status not in self.ALLOWEDSTATUS:
+        if status not in ALLOWEDSTATUS:
             return make_response(
                 jsonify(
                     message='Invalid status, aborting status updation,'
-                    ' allowed states inlcude %s' % (self.ALLOWEDSTATUS)
+                    ' allowed states inlcude %s' % (ALLOWEDSTATUS)
                 ), 400
             )
         curr_user = get_current_user()
+        if job.status == status or job.status == 'cancelled':
+            return make_response(
+                jsonify(message=f'Job already {job.status}'),
+                422
+            )
         if status == 'cancelled':
             # verify user is a manager
             if not curr_user.is_manager:
                 return make_response(
                     jsonify(message='Not auhorized to cancel jobs'),
                     401
-                )
-            elif job.status == 'accepted':
-                return make_response(
-                    jsonify(message='Job already accepted'),
-                    422
                 )
         # get prioratised job here
         job.update(status=status)
@@ -119,6 +119,6 @@ class ValetJobResource(DeliveryValetResources):
             return schema.jsonify(job)
         else:
             make_response(
-                jsonify(message='Job has been cancelled ny manager'),
+                jsonify(message='Job has been cancelled by manager'),
                 422
             )
