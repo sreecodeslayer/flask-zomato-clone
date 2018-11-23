@@ -9,6 +9,9 @@ from flask_jwt_extended import get_current_user
 from datetime import datetime
 
 
+ALLOWEDSTATUS = ['accepted', 'declined', 'completed', 'cancelled']
+
+
 class JobsResource(ManagerResources):
     def get(self):
         schema = JobSchema(many=True)
@@ -72,8 +75,6 @@ class ValetDeliveriesResource(DeliveryValetResources):
 
 class JobStatusResource(JWTResource):
 
-    ALLOWEDSTATUS = ['accepted', 'declined', 'completed', 'cancelled']
-
     def patch(self, jid):
         if not request.is_json:
             return make_response(
@@ -88,10 +89,36 @@ class JobStatusResource(JWTResource):
                     ' allowed states inlcude %s' % (self.ALLOWEDSTATUS)
                 ), 400
             )
-
+        curr_user = get_current_user()
+        if status == 'cancelled':
+            # verify user is a manager
+            if not curr_user.is_manager:
+                return make_response(
+                    jsonify(message='Not auhorized to cancel jobs'),
+                    401
+                )
+            elif job.status == 'accepted':
+                return make_response(
+                    jsonify(message='Job already accepted'),
+                    422
+                )
         # get prioratised job here
         job.update(status=status)
         job.update(add_to_set__history=[History(
             status=status, made_at=datetime.utcnow)])
 
         return schema.jsonify(job.reload())
+
+
+class ValetJobResource(DeliveryValetResources):
+    def get(self):
+        job = rmq.seek_job()
+        job = Jobs.objects.get_or_404(id=jid)
+        if job.status != 'cancelled':
+            schema = JobSchema()
+            return schema.jsonify(job)
+        else:
+            make_response(
+                jsonify(message='Job has been cancelled ny manager'),
+                422
+            )

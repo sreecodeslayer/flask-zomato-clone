@@ -6,5 +6,6 @@ from .jobs import (
     JobResource,
     JobsResource,
     JobStatusResource,
-    ValetDeliveriesResource
+    ValetDeliveriesResource,
+    ValetJobResource
 )
