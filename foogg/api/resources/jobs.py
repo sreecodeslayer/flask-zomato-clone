@@ -66,7 +66,7 @@ class ValetDeliveriesResource(DeliveryValetResources):
         schema = JobSchema(many=True)
         previous = ['completed', 'declined', 'cancelled']
         jobs = Jobs.objects(
-            delivered_by=get_current_user(), status__in=previos)
+            delivered_by=get_current_user(), status__in=previous)
         by_status = request.args.get('status')
         if by_status:
             jobs = jobs.filter(status=by_status)
