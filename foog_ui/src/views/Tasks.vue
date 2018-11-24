@@ -1,5 +1,7 @@
 <template>
   <div id="tasks-wrapper">
+    <el-row :gutter="24">
+      <el-col :span="20">
     <el-tabs v-model="activeTabName">
       <el-tab-pane label="Active Tasks" name="current">
         {{activeTasks}}
@@ -36,6 +38,28 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
+  </el-col>
+  <el-col :span="4">
+    <el-card shadow="hover">
+      <h4>New task</h4>
+      <el-form ref="newTaskForm" label-position="top"  :model="newTaskForm" @submit.native.prevent="addNewTask">
+        <el-form-item label="Title">
+              <el-input v-model="newTaskForm.title" placeholder="Task title here"></el-input>
+        </el-form-item>
+        <el-form-item label="Priority">
+              <el-select v-model="newTaskForm.priority">
+                <el-option label="Low" value="low"></el-option>
+                <el-option label="Medium" value="medium"></el-option>
+                <el-option label="High" value="high"></el-option>
+              </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="success" native-type="submit">Add</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </el-col>
+  </el-row>
   </div>
 </template>
 <style></style>
@@ -48,6 +72,10 @@ export default{
       tasks: {
         pagination: { page: 1, total: 0, totalPages: 0, perPage: 10 },
         results: []
+      },
+      newTaskForm: {
+        title: '',
+        priority: ''
       }
     }
   },

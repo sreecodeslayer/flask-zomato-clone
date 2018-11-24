@@ -3,8 +3,8 @@
     <el-row>
       <el-col :span="24"></el-col>
     </el-row>
-    <el-row>
-      <el-col :span="24">
+    <el-row  :gutter="24">
+      <el-col :span="20">
         <el-table :data="tasks.results" style="width: 100%">
           <el-table-column type="expand">
             <template slot-scope="scope">
@@ -30,10 +30,17 @@
           </el-table-column>
           <el-table-column label="Action">
             <template slot-scope="scope">
-                <el-button size="small" type="danger" icon="el-icon-delete" circle @click></el-button>
+              <el-button size="small" type="danger" icon="el-icon-delete" circle @click></el-button>
             </template>
           </el-table-column>
         </el-table>
+      </el-col>
+      <el-col :span="4">
+        <h4>Updates</h4>
+        <el-card shadow="hover" v-if="eligible && updated">
+          <i class="el-icon-info"></i>A new task is available
+        </el-card>
+        <p v-else>No tasks available</p>
       </el-col>
     </el-row>
   </div>
@@ -45,7 +52,8 @@ export default {
   name: 'home',
   data () {
     return {
-
+      eligible: false,
+      updated: false,
       tasks: {
         pagination: { page: 1, total: 0, totalPages: 0, perPage: 10 },
         results: []
@@ -64,6 +72,7 @@ export default {
       })
     },
     realtime (data) {
+      this.updated = data.status
     }
   },
   methods: {
