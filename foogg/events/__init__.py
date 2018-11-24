@@ -1,16 +1,30 @@
 from flask_socketio import emit, join_room, leave_room, disconnect
-from ..extensions import socketio, rmq
+from ..extensions import socketio, rmq, jwt
 from ..log import logger
 from threading import Lock
 from flask import request
-from flask_jwt_extended import jwt_required
-from flask_socketio import join_room, leave_room, emit, send
+from flask_jwt_extended import decode_token
+from flask_socketio import join_room, leave_room, emit, send, disconnect
 from threading import Lock
-
+from functools import wraps
 ROOM = 'realtime_updates'
 
 thread = None
 lock = Lock()
+
+
+def validate_user(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        token = request.args.get('token')
+        decoded = decode_token(token)
+        decoded = jwt._claims_verification_callback(decoded)
+        if not decoded:
+            disconnect()
+        logger.debug(f'Authorized => {decoded}')
+
+        return fn(*args, **kwargs)
+    return wrapper
 
 
 def background_thread():
@@ -43,8 +57,10 @@ with lock:
 
 
 @socketio.on('connect', namespace='/updates')
+@validate_user
 def connected():
-    logger.debug('Client [%s] connected for updates' % (request.sid))
+    logger.debug(f'Client [{request.sid}] connected for updates]')
+
     join_room(ROOM)
     emit(
         'status', {'title': 'Welcome!',
