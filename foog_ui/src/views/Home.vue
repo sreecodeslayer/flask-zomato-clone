@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     fetchMyTasks () {
-      let url = '/api/v1/jobs' +
+      let url = '/api/v1/valets/deliveries' +
         '?page=' + this.tasks.pagination.page +
         '&perPage=' + this.tasks.pagination.perPage
 
@@ -88,7 +88,18 @@ export default {
           this.tasks.pagination.total = response.data.total
         },
         (err) => {
-
+          if (err.response.status === 403) {
+            this.$alert('Seems like you are accessing Delivery tasks details.\nYou have been logged out.\nPlease login back into delivery account', 'Oops!', {
+              confirmButtonText: 'OK',
+              showClose: false,
+              type: 'error',
+              callback: action => {
+                this.$socket.disconnect()
+                this.$auth.logout()
+                window.location = '/'
+              }
+            })
+          }
         }
       )
     }

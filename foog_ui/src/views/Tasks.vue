@@ -115,8 +115,9 @@ export default{
     },
     deleteTask (id) {
       let url = '/api/v1/jobs/' + id
-      this.$http.delete(url).then((response) => {}, (err) => {})
-      this.fetchTasks()
+      this.$http.delete(url).then((response) => {
+        this.fetchTasks()
+      }, (err) => {})
     }
   },
   mounted () {

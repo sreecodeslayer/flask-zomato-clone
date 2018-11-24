@@ -7,6 +7,7 @@ from flask_jwt_extended import decode_token
 from flask_socketio import join_room, leave_room, emit, send, disconnect
 from threading import Lock
 from functools import wraps
+import jwt.exceptions as jwt_errs
 ROOM = 'realtime_updates'
 
 thread = None
@@ -17,12 +18,18 @@ def validate_user(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         token = request.args.get('token')
-        decoded = decode_token(token)
-        decoded = jwt._claims_verification_callback(decoded)
-        if not decoded:
-            disconnect()
-        logger.debug(f'Authorized => {decoded}')
+        try:
+            decoded = decode_token(token)
+            decoded = jwt._claims_verification_callback(decoded)
+            if not decoded:
+                disconnect()
+            logger.debug(f'Authorized => {decoded}')
 
+            join_room(ROOM)
+        except jwt_errs.DecodeError:
+            leave_room(ROOM)
+            disconnect()
+            return None
         return fn(*args, **kwargs)
     return wrapper
 
@@ -61,7 +68,6 @@ with lock:
 def connected():
     logger.debug(f'Client [{request.sid}] connected for updates]')
 
-    join_room(ROOM)
     emit(
         'status', {'title': 'Welcome!',
                    'message': 'You are now connected to real time updates'},
