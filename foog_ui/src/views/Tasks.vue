@@ -32,7 +32,7 @@
           </el-table-column>
           <el-table-column label="Action">
             <template slot-scope="scope">
-                <el-button size="small" type="danger" icon="el-icon-delete" circle @click></el-button>
+                <el-button size="small" type="danger" icon="el-icon-delete" circle @click="deleteTask(scope.row.id)"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -103,6 +103,20 @@ export default{
 
         }
       )
+    },
+    addNewTask () {
+      let url = '/api/v1/jobs'
+
+      this.$http.post(url, this.newTaskForm).then(
+        (response) => {
+          this.tasks.results.push(response.data)
+        },
+        (err) => {})
+    },
+    deleteTask (id) {
+      let url = '/api/v1/jobs/' + id
+      this.$http.delete(url).then((response) => {}, (err) => {})
+      this.fetchTasks()
     }
   },
   mounted () {
