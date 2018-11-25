@@ -1,6 +1,7 @@
 from flask_socketio import emit, join_room, leave_room, disconnect
 from ..extensions import socketio, rmq, jwt
 from ..log import logger
+from ..models import Users
 from threading import Lock
 from flask import request
 from flask_jwt_extended import decode_token
@@ -8,7 +9,8 @@ from flask_socketio import join_room, leave_room, emit, send, disconnect
 from threading import Lock
 from functools import wraps
 import jwt.exceptions as jwt_errs
-ROOM = 'realtime_updates'
+VALET_ROOM = 'realtime-valet-updates'
+MANAGER_ROOM = 'realtime-manager-updates'
 
 thread = None
 lock = Lock()
@@ -20,14 +22,18 @@ def validate_user(fn):
         token = request.args.get('token')
         try:
             decoded = decode_token(token)
+
+            uid = decoded.get('identity')
             decoded = jwt._claims_verification_callback(decoded)
             if not decoded:
                 disconnect()
             logger.debug(f'Authorized => {decoded}')
-
-            join_room(ROOM)
+            user = Users.objects.get(id=uid)
+            if user.is_manager:
+                join_room(MANAGER_ROOM)
+            else:
+                join_room(VALET_ROOM)
         except jwt_errs.DecodeError:
-            leave_room(ROOM)
             disconnect()
             return None
         return fn(*args, **kwargs)
@@ -47,13 +53,13 @@ def background_thread():
             msg = 'A new task is available'
             status = True
         socketio.emit(
-            'realtime',
+            'realtime-valet',
             {
                 'message': msg,
                 'status': status
             },
             json=True,
-            room=ROOM,
+            room=VALET_ROOM,
             namespace='/updates'
         )
 
@@ -69,9 +75,17 @@ def connected():
     logger.debug(f'Client [{request.sid}] connected for updates]')
 
     emit(
-        'status', {'title': 'Welcome!',
-                   'message': 'You are now connected to real time updates'},
-        room=ROOM,
+        'valet-status', {'title': 'Welcome Valet!',
+                         'message': 'You are now connected to real time updates'},
+        room=VALET_ROOM,
+        json=True,
+        namespace='/updates'
+    )
+
+    emit(
+        'manager-status', {'title': 'Welcome Manager!',
+                           'message': 'You are now connected to real time updates'},
+        room=MANAGER_ROOM,
         json=True,
         namespace='/updates'
     )
@@ -80,4 +94,5 @@ def connected():
 @socketio.on('disconnect', namespace='/updates')
 def disconnect():
     logger.debug('Client [%s] disconnected from updates' % (request.sid))
-    leave_room(ROOM)
+    leave_room(VALET_ROOM)
+    leave_room(MANAGER_ROOM)

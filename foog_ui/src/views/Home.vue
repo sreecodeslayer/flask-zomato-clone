@@ -30,7 +30,7 @@
           </el-table-column>
           <el-table-column label="Action">
             <template slot-scope="scope">
-              <el-dropdown @command="handlePatchStatus">
+              <el-dropdown @command="handlePatchStatus" v-if="scope.row.status !== 'completed'">
                 <span class="el-dropdown-link">
                   Change status<i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
@@ -40,6 +40,7 @@
                   <el-dropdown-item :disabled="scope.row.status === 'completed'" :command="{status:'completed',id:scope.row.id}">Complete</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
+              <span v-else>No action available</span>
             </template>
           </el-table-column>
         </el-table>
@@ -61,7 +62,35 @@
       <el-col :span="20">
         <el-tabs v-model="activeTabName">
           <el-tab-pane label="Active Tasks" name="current">
-            {{activeTasks}}
+            <el-table :data="activeTasks" style="width: 100%">
+              <el-table-column type="expand">
+                <template slot-scope="scope">
+                  <h4>History</h4>
+                  <span v-for="his in scope.row.history">
+                    <p><el-tag size="medium" type="success">{{ his.status }}</el-tag>&nbsp;(Updated {{his.made_at | humanizeTime}})</p>
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="Title" prop="title"></el-table-column>
+              <el-table-column label="Current Status" prop="status"></el-table-column>
+              <el-table-column label="Priority">
+                <template slot-scope="scope">
+                  <el-tag size="medium" v-if="scope.row.priority === 'low'" type="warning">{{ scope.row.priority }}</el-tag>
+                  <el-tag size="medium" v-if="scope.row.priority === 'medium'" type="info">{{ scope.row.priority }}</el-tag>
+                  <el-tag size="medium" v-if="scope.row.priority === 'high'" type="danger">{{ scope.row.priority }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="Created on">
+                <template slot-scope="scope">
+                  {{scope.row.created_on | calendarTime}}
+                </template>
+              </el-table-column>
+              <el-table-column label="Action">
+                <template slot-scope="scope">
+                  <el-button size="small" type="danger" icon="el-icon-delete" circle @click="deleteTask(scope.row.id)"></el-button>
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
           <el-tab-pane :label="'Previous Tasks ( '+tasks.results.length+' )'" name="previous">
             <el-table :data="tasks.results" style="width: 100%">
@@ -135,7 +164,10 @@
         </span>
       </div>
       <div v-else>
-        <span><el-alert title="Job fetch error" type="error" :description="newJobDialog.errs" :show-icon="false"></el-alert></span>
+        <p>
+          <el-alert title="Job fetch error" type="error" :description="newJobDialog.errs" :show-icon="true" :closable="false"></el-alert>
+        </p>
+        <el-button type="success" @click="newJobDialog.value= false;newJobDialog.errs= ''">OK</el-button>
       </div>
     </el-dialog>
 
@@ -170,20 +202,11 @@ export default {
     connect () {
     },
     disconnect () {
-    },
-    status (data) {
-      this.$notify({
-        title: data.title,
-        message: this.$createElement('i', { style: 'color: teal' }, data.message)
-      })
-    },
-    realtime (data) {
-      this.updated = data.status
     }
   },
   computed: {
     activeTasks () {
-      return this.tasks.results.filter((task) => (task.status === 'accepted'))
+      return this.tasks.results.filter((task) => (task.status === 'accepted' || task.status === 'new' || task.status === 'declined'))
     }
   },
   methods: {
@@ -231,12 +254,12 @@ export default {
 
       if (this.valet) {
         url = '/api/v1/valets/deliveries' +
-          '?page=' + this.tasks.pagination.page +
-          '&perPage=' + this.tasks.pagination.perPage
+        '?page=' + this.tasks.pagination.page +
+        '&perPage=' + this.tasks.pagination.perPage
       } else {
         url = '/api/v1/jobs' +
-          '?page=' + this.tasks.pagination.page +
-          '&perPage=' + this.tasks.pagination.perPage
+        '?page=' + this.tasks.pagination.page +
+        '&perPage=' + this.tasks.pagination.perPage
       }
 
       console.log(url)
@@ -266,6 +289,31 @@ export default {
     this.manager = this.user.roles.includes('manager')
     this.valet = !this.manager
     this.fetchTasks()
+    var event = 'valet-status'
+    if (this.manager) {
+      this.sockets.subscribe('realtime-manager', (data) => {
+        console.log(data)
+      })
+      this.sockets.subscribe('manager-status', (data) => {
+        console.log(data)
+        this.$notify({
+          title: data.title,
+          message: this.$createElement('i', { style: 'color: teal' }, data.message)
+        })
+      })
+    } else {
+      this.sockets.subscribe('realtime-valet', (data) => {
+        console.log(data)
+        this.updated = data.status
+      })
+      this.sockets.subscribe('valet-status', (data) => {
+        console.log(data)
+        this.$notify({
+          title: data.title,
+          message: this.$createElement('i', { style: 'color: teal' }, data.message)
+        })
+      })
+    }
   },
   ready () {
   }
