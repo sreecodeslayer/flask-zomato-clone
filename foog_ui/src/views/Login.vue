@@ -57,6 +57,7 @@ export default{
       this.$auth.login(user, requestOptions).then((response) => {
         if (response.status === 200) {
           this.loading = false
+          window.localStorage.user = JSON.stringify(response.data.user)
           window.location = '/'
         }
       }, (err) => {

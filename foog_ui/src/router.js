@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Login from './views/Login.vue'
-import Tasks from './views/Tasks.vue'
+import loadUser from './utils'
 Vue.use(Router)
 
 let router = new Router({
@@ -15,20 +15,10 @@ let router = new Router({
       component: Home
     },
     {
-      path: '/tasks',
-      name: 'tasks',
-      component: Tasks
-    },
-    {
       path: '/login',
       name: 'login',
       component: Login,
-      meta: { public: true }
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: () => import('./views/About.vue')
+      meta: { public: true, role: 'both' }
     }
   ]
 })

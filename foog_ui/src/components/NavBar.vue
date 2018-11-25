@@ -6,8 +6,8 @@
           <el-col :span="21">
             <!-- Navs -->
             <el-menu :default-active="activeIndex" background-color="teal" text-color="white" router mode="horizontal"  active-text-color="yellow" style="border-bottom: none;background-color: transparent;">
-              <el-menu-item index="1" :route="{path:'/'}">Home</el-menu-item>
-              <el-menu-item index="2" :route="{path:'/tasks'}">Tasks</el-menu-item>
+              <el-menu-item index="1" :route="{path:'/'}" v-if="user.roles.includes('valet')">Home</el-menu-item>
+              <el-menu-item index="2" :route="{path:'/tasks'}" v-else>Home</el-menu-item>
             </el-menu>
           </el-col>
           <el-col :span="3" style="height: 60px">
@@ -37,12 +37,23 @@ export default {
   data () {
     return {
       activeIndex: '1',
-      hasTasks: false
+      hasTasks: false,
+      user: { roles: [] }
     }
   },
   sockets: {
     realtime (data) {
       this.hasTasks = data.status
+    }
+  },
+  mounted () {
+    try {
+      this.user = JSON.parse(window.localStorage.user)
+      console.log(this.user)
+    } catch (SyntaxError) {
+      this.$auth.logout()
+      window.localStorage.user = ''
+      window.location = '/'
     }
   }
 }
