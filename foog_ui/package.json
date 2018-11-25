@@ -17,7 +17,7 @@
     "vue-cookies": "^1.5.7",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
-    "vue-socket.io": "^3.0.0"
+    "vue-socket.io": "3.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",

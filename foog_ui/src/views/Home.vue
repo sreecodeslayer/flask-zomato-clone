@@ -204,6 +204,7 @@
 </template>
 
 <script>
+import '@/plugins/socketio.js'
 import loadUser from '@/utils'
 export default {
   name: 'home',
