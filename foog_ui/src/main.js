@@ -6,6 +6,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueMoment from 'vue-moment'
 import './plugins/element.js'
+import './plugins/socketio.js'
 let API_ENDPOINT = process.env.VUE_APP_API
 console.log(API_ENDPOINT)
 axios.defaults.headers.post['Content-Type'] = 'application/json'
