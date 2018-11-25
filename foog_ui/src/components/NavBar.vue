@@ -13,11 +13,7 @@
           <el-col :span="3" style="height: 60px">
             <!-- Notification/Logout buttons -->
             <el-menu :default-active="activeIndex"  text-color="white" router mode="horizontal"  active-text-color="yellow" style="border-bottom: none;background-color: transparent;">
-              <el-menu-item index="3" :route="{path:'/'}">
-                <el-badge is-dot class="item" v-if="hasTasks"><i class="el-icon-bell" style="color: yellow" /></el-badge>
-                <i v-else class="el-icon-bell" style="color: white" />
-              </el-menu-item>
-              <el-menu-item index="4"><i class="el-icon-d-arrow-right"  style="color: white" @click="$auth.logout()"/></el-menu-item>
+              <el-menu-item index="/login" @click="$auth.logout()"><i class="el-icon-d-arrow-right"  style="color: white" /></el-menu-item>
             </el-menu>
           </el-col>
         </el-row>

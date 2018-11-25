@@ -95,13 +95,6 @@ class JobStatusResource(JWTResource):
                 jsonify(message=f'Job already {job.status}'),
                 422
             )
-        if status == 'cancelled':
-            # verify user is a manager
-            if not curr_user.is_manager:
-                return make_response(
-                    jsonify(message='Not authorized to cancel jobs'),
-                    401
-                )
         if curr_user.is_valet:
             valet = curr_user
             if status == 'declined':
@@ -109,6 +102,14 @@ class JobStatusResource(JWTResource):
                 queue_string = str(job.id)
                 # Insert it back into queue
                 rmq.publish_job(queue_string, PRIORITIES.get(job.priority))
+        if status == 'cancelled':
+            # verify user is a manager
+            valet = None
+            if not curr_user.is_manager:
+                return make_response(
+                    jsonify(message='Not authorized to cancel jobs'),
+                    401
+                )
 
         change = f'{job.status}=>{status}'
         job.update(valet=valet)

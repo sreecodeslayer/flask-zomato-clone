@@ -81,7 +81,7 @@
               <el-table-column label="Priority">
                 <template slot-scope="scope">
                   <el-tag size="medium" v-if="scope.row.priority === 'low'" type="warning">{{ scope.row.priority }}</el-tag>
-                  <el-tag size="medium" v-if="scope.row.priority === 'medium'" type="info">{{ scope.row.priority }}</el-tag>
+                  <el-tag size="medium" v-if="scope.row.priority === 'medium'" type="primary">{{ scope.row.priority }}</el-tag>
                   <el-tag size="medium" v-if="scope.row.priority === 'high'" type="danger">{{ scope.row.priority }}</el-tag>
                 </template>
               </el-table-column>
@@ -92,7 +92,15 @@
               </el-table-column>
               <el-table-column label="Action">
                 <template slot-scope="scope">
-                  <el-button size="small" type="danger" icon="el-icon-delete" circle @click="deleteTask(scope.row.id)"></el-button>
+                  <el-dropdown @command="handlePatchStatus" v-if="scope.row.status === 'new'">
+                    <span class="el-dropdown-link">
+                      Change status<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item :disabled="scope.row.status !== 'new'" :command="{status:'cancelled',id:scope.row.id}">Cancel</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                  <span v-else>No action available</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -112,7 +120,7 @@
               <el-table-column label="Priority">
                 <template slot-scope="scope">
                   <el-tag size="medium" v-if="scope.row.priority === 'low'" type="warning">{{ scope.row.priority }}</el-tag>
-                  <el-tag size="medium" v-if="scope.row.priority === 'medium'" type="info">{{ scope.row.priority }}</el-tag>
+                  <el-tag size="medium" v-if="scope.row.priority === 'medium'" type="primary">{{ scope.row.priority }}</el-tag>
                   <el-tag size="medium" v-if="scope.row.priority === 'high'" type="danger">{{ scope.row.priority }}</el-tag>
                 </template>
               </el-table-column>
@@ -123,13 +131,15 @@
               </el-table-column>
               <el-table-column label="Action">
                 <template slot-scope="scope">
-                  <el-dropdown @command="handlePatchStatus" split-button type="danger" @click="deleteTask(scope.row.id)">
-                    <el-dropdown-menu slot="dropdown" >
-                      Delete
+                  <el-dropdown @command="handlePatchStatus" v-if="scope.row.status === 'new'">
+                    <span class="el-dropdown-link">
+                      Change status<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item :disabled="scope.row.status !== 'new'" :command="{status:'cancelled',id:scope.row.id}">Decline</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
-                  <!-- <el-button size="small" type="danger" icon="el-icon-delete" circle @click="deleteTask(scope.row.id)"></el-button> -->
+                  <span v-else>No action available</span>
                 </template>
               </el-table-column>
             </el-table>
