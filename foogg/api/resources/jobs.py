@@ -120,6 +120,18 @@ class JobStatusResource(JWTResource):
 
 class ValetJobResource(DeliveryValetResources):
     def get(self):
+
+        # Check if valet has more than 3 pending jobs
+        curr_user = get_current_user()
+        jobs = Jobs.objects(
+            valet=curr_user, status__in=['accepted']).count()
+        logger.debug(f'User has {jobs} tasks in accepted state')
+        if jobs > 2:
+            return make_response(
+                jsonify(
+                    message=f'You have currently {jobs} jobs pending.'
+                    ' Please complete them'
+                ), 422)
         jid = rmq.seek_job()
         job = Jobs.objects.get_or_404(id=jid)
         if job.status != 'cancelled':

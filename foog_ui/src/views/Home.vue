@@ -119,19 +119,24 @@
     </el-row>
 
     <!-- Dialogs -->
-    <el-dialog  :visible.sync="newJobDialog.value" width="30%" :close-on-click-modal="false" :show-close="false" :close-on-press-escape="false" v-if="valet && newJobDialog.data.id">
-      <span><h2>{{newJobDialog.data.title}}</h2></span>
-      <p>Manager: {{newJobDialog.data.created_by.username}}({{newJobDialog.data.created_by.email}})</p>
-      <p>Created on: {{newJobDialog.data.created_on | calendarTime}}</p>
-      <p>Priority:
-        <el-tag size="medium" v-if="newJobDialog.data.priority === 'low'" type="warning">{{ newJobDialog.data.priority }}</el-tag>
-        <el-tag size="medium" v-if="newJobDialog.data.priority === 'medium'" type="info">{{ newJobDialog.data.priority }}</el-tag>
-        <el-tag size="medium" v-if="newJobDialog.data.priority === 'high'" type="danger">{{ newJobDialog.data.priority }}</el-tag>
-      </p>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="danger" @click="newJobDialog.value= false;patchStatus('declined',newJobDialog.data.id)">Decline</el-button>
-        <el-button type="success" @click="newJobDialog.value= false;patchStatus('accepted',newJobDialog.data.id)">Accept</el-button>
-      </span>
+    <el-dialog  :visible.sync="newJobDialog.value" width="30%" :close-on-click-modal="false" :show-close="false" :close-on-press-escape="false" v-if="valet && (newJobDialog.data.id || newJobDialog.errs)">
+      <div v-if="!newJobDialog.errs">
+        <span><h2>{{newJobDialog.data.title}}</h2></span>
+        <p>Manager: {{newJobDialog.data.created_by.username}}({{newJobDialog.data.created_by.email}})</p>
+        <p>Created on: {{newJobDialog.data.created_on | calendarTime}}</p>
+        <p>Priority:
+          <el-tag size="medium" v-if="newJobDialog.data.priority === 'low'" type="warning">{{ newJobDialog.data.priority }}</el-tag>
+          <el-tag size="medium" v-if="newJobDialog.data.priority === 'medium'" type="info">{{ newJobDialog.data.priority }}</el-tag>
+          <el-tag size="medium" v-if="newJobDialog.data.priority === 'high'" type="danger">{{ newJobDialog.data.priority }}</el-tag>
+        </p>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="danger" @click="newJobDialog.value= false;patchStatus('declined',newJobDialog.data.id)">Decline</el-button>
+          <el-button type="success" @click="newJobDialog.value= false;patchStatus('accepted',newJobDialog.data.id)">Accept</el-button>
+        </span>
+      </div>
+      <div v-else>
+        <span><el-alert title="Job fetch error" type="error" :description="newJobDialog.errs" :show-icon="false"></el-alert></span>
+      </div>
     </el-dialog>
 
   </div>
@@ -148,7 +153,7 @@ export default {
       eligible: false,
       updated: false,
       statusUpdateId: '',
-      newJobDialog: { value: false, data: {} },
+      newJobDialog: { value: false, data: {}, errs: '' },
       manager: false,
       valet: false,
       tasks: {
@@ -192,7 +197,10 @@ export default {
           this.newJobDialog.value = true
           this.newJobDialog.data = response.data
         },
-        (err) => {})
+        (err) => {
+          this.newJobDialog.value = true
+          this.newJobDialog.errs = err.response.data.message
+        })
     },
     addNewTask () {
       let url = '/api/v1/jobs'
