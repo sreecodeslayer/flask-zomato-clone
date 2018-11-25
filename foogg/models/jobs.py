@@ -15,6 +15,7 @@ class Jobs(db.Document):
     history = db.EmbeddedDocumentListField(History)
     created_on = db.DateTimeField(default=datetime.utcnow)
     created_by = db.ReferenceField(Users)
+    valet = db.ReferenceField(Users)
 
     meta = {
         'indexes': ['priority', 'created_on']

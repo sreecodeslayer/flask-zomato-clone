@@ -64,9 +64,9 @@ class JobResource(ManagerResources):
 class ValetDeliveriesResource(DeliveryValetResources):
     def get(self):
         schema = JobSchema(many=True)
-        previous = ['completed', 'declined', 'cancelled']
+        previous = ['accepted', 'completed', 'declined', 'cancelled']
         jobs = Jobs.objects(
-            delivered_by=get_current_user(), status__in=previous)
+            valet=get_current_user(), status__in=previous)
         by_status = request.args.get('status')
         if by_status:
             jobs = jobs.filter(status=by_status)
@@ -102,7 +102,15 @@ class JobStatusResource(JWTResource):
                     jsonify(message='Not authorized to cancel jobs'),
                     401
                 )
-        # get prioratised job here
+        if curr_user.is_valet:
+            valet = curr_user
+            if status == 'declined':
+                valet = None
+                queue_string = str(job.id)
+                # Insert it back into queue
+                rmq.publish_job(queue_string, PRIORITIES.get(job.priority))
+
+        job.update(valet=valet)
         job.update(status=status)
         job.update(add_to_set__history=[History(
             status=status, made_at=datetime.utcnow)])
@@ -112,7 +120,7 @@ class JobStatusResource(JWTResource):
 
 class ValetJobResource(DeliveryValetResources):
     def get(self):
-        job = rmq.seek_job()
+        jid = rmq.seek_job()
         job = Jobs.objects.get_or_404(id=jid)
         if job.status != 'cancelled':
             schema = JobSchema()

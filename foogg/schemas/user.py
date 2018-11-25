@@ -11,14 +11,14 @@ from .base import ObjectId
 
 class UserSchema(ma.Schema):
     id = ObjectId(dump_only=True)
-    username = ma.String(required=True)
-    email = ma.String(
+    username = ma.Str(required=True)
+    email = ma.Str(
         required=True,
         validate=validate.Email(
             error='Not a valid email address')
     )
-    passwd_digest = ma.String(load_only=True, required=True)
-    roles = ma.List(ma.String, default=['manager'])
+    passwd_digest = ma.Str(load_only=True, required=True)
+    roles = ma.List(ma.Str, default=['manager'])
     joined_on = ma.DateTime(dump_only=True)
 
     @post_load

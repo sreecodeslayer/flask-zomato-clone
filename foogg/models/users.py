@@ -18,6 +18,10 @@ class Users(db.Document):
     def is_manager(self):
         return 'manager' in self.roles
 
+    @property
+    def is_valet(self):
+        return 'valet' in self.roles
+
     def __init__(self, **kwargs):
         super(Users, self).__init__(**kwargs)
 

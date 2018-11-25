@@ -33,11 +33,12 @@ def login():
 
     access_token = create_access_token(identity=str(user.id))
     refresh_token = create_refresh_token(identity=str(user.id))
+    schema = UserSchema()
 
     ret = {
         'access_token': access_token,
         'refresh_token': refresh_token,
-        'roles': user.roles
+        'user': schema.dump(user).data
     }
     return jsonify(ret), 200
 

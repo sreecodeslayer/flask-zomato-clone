@@ -37,7 +37,8 @@ class JobSchema(ma.Schema):
     status = ma.String(dump_only=True)
     priority = ma.String(required=True, validate=validate_choice)
     created_on = ma.DateTime(default=datetime.utcnow)
-    created_by = ma.Nested(UserSchema)
+    created_by = ma.Nested(UserSchema, exclude=['passwd_digest'])
+    valet = ma.Nested(UserSchema, exclude=['passwd_digest'])
     history = ma.List(ma.Nested(HistorySchema))
 
     @post_load
