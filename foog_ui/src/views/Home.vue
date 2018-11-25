@@ -232,7 +232,9 @@ export default {
         (response) => {
           this.tasks.results.push(response.data)
         },
-        (err) => {})
+        (err) => {
+          console.log(err)
+        })
     },
     deleteTask (id) {
       let url = '/api/v1/jobs/' + id
@@ -262,8 +264,6 @@ export default {
         '&perPage=' + this.tasks.pagination.perPage
       }
 
-      console.log(url)
-
       this.$http.get(url).then(
         (response) => {
           this.tasks.results = response.data.results
@@ -271,7 +271,7 @@ export default {
           this.tasks.pagination.total = response.data.total
         },
         (err) => {
-
+          console.log(err)
         }
       )
     }
@@ -295,7 +295,6 @@ export default {
         console.log(data)
       })
       this.sockets.subscribe('manager-status', (data) => {
-        console.log(data)
         this.$notify({
           title: data.title,
           message: this.$createElement('i', { style: 'color: teal' }, data.message)
@@ -303,11 +302,9 @@ export default {
       })
     } else {
       this.sockets.subscribe('realtime-valet', (data) => {
-        console.log(data)
         this.updated = data.status
       })
       this.sockets.subscribe('valet-status', (data) => {
-        console.log(data)
         this.$notify({
           title: data.title,
           message: this.$createElement('i', { style: 'color: teal' }, data.message)

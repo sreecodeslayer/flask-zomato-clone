@@ -110,10 +110,24 @@ class JobStatusResource(JWTResource):
                 # Insert it back into queue
                 rmq.publish_job(queue_string, PRIORITIES.get(job.priority))
 
+        change = f'{job.status}=>{status}'
         job.update(valet=valet)
         job.update(status=status)
         job.update(add_to_set__history=[History(
             status=status, made_at=datetime.utcnow)])
+
+        msg = f'{curr_user.username} updated job [{job.title}]'
+        socketio.emit(
+            'realtime-manager',
+            {
+                'message': msg,
+                'change': change,
+                'status': True
+            },
+            json=True,
+            room='realtime-manager-updates',
+            namespace='/updates'
+        )
 
         return schema.jsonify(job.reload())
 
