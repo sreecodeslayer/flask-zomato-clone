@@ -144,6 +144,14 @@
             </el-form-item>
           </el-form>
         </el-card>
+        <el-card shadow="hover">
+          <h4>Recent updates</h4>
+          <div>
+            <p v-for="(rec,index) in recentUpdatesReversed" :key="index">
+              <span>{{rec.message}} <strong>{{rec.change}}</strong></span>
+            </p>
+          </div>
+        </el-card>
       </el-col>
     </el-row>
 
@@ -192,6 +200,7 @@ export default {
         pagination: { page: 1, total: 0, totalPages: 0, perPage: 10 },
         results: []
       },
+      recentUpdates: [],
       newTaskForm: {
         title: '',
         priority: ''
@@ -207,6 +216,9 @@ export default {
   computed: {
     activeTasks () {
       return this.tasks.results.filter((task) => (task.status === 'accepted' || task.status === 'new' || task.status === 'declined'))
+    },
+    recentUpdatesReversed () {
+      return this.recentUpdates.slice().reverse()
     }
   },
   methods: {
@@ -292,7 +304,8 @@ export default {
     var event = 'valet-status'
     if (this.manager) {
       this.sockets.subscribe('realtime-manager', (data) => {
-        console.log(data)
+        this.fetchTasks()
+        this.recentUpdates.push(data)
       })
       this.sockets.subscribe('manager-status', (data) => {
         this.$notify({

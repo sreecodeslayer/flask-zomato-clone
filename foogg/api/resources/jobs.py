@@ -37,13 +37,13 @@ class JobsResource(ManagerResources):
         # Send the notification as it need not wait for the beat
 
         socketio.emit(
-            'realtime',
+            'realtime-valet',
             {
                 'message': 'A new task is available',
                 'status': True
             },
             json=True,
-            room='realtime_updates',
+            room='realtime-valet-updates',
             namespace='/updates'
         )
         return schema.jsonify(job)
