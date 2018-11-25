@@ -3,13 +3,16 @@
     <el-row>
       <el-col :span="24"></el-col>
     </el-row>
+
+    <!-- VALET AREA -->
+
     <el-row  :gutter="24" v-if="valet">
       <el-col :span="20">
         <el-table :data="tasks.results" style="width: 100%">
           <el-table-column type="expand">
             <template slot-scope="scope">
               <h4>History</h4>
-              <span v-for="his in scope.row.history">
+              <span v-for="(his,index) in scope.row.history" :key="index">
                 <p><el-tag size="medium" type="success">{{ his.status }}</el-tag>&nbsp;(Updated {{his.made_at | humanizeTime}})</p>
               </span>
             </template>
@@ -58,6 +61,8 @@
         <p v-else>No tasks available</p>
       </el-col>
     </el-row>
+
+    <!-- MANAGER AREA -->
     <el-row  :gutter="24" v-if="manager">
       <el-col :span="20">
         <el-tabs v-model="activeTabName">
@@ -66,7 +71,7 @@
               <el-table-column type="expand">
                 <template slot-scope="scope">
                   <h4>History</h4>
-                  <span v-for="his in scope.row.history">
+                  <span v-for="(his,index) in scope.row.history" :key="index">
                     <p><el-tag size="medium" type="success">{{ his.status }}</el-tag>&nbsp;(Updated {{his.made_at | humanizeTime}})</p>
                   </span>
                 </template>
@@ -97,7 +102,7 @@
               <el-table-column type="expand">
                 <template slot-scope="scope">
                   <h4>History</h4>
-                  <span v-for="his in scope.row.history">
+                  <span v-for="(his,index) in scope.row.history" :key="index">
                     <p><el-tag size="medium" type="success">{{ his.status }}</el-tag>&nbsp;(Updated {{his.made_at | humanizeTime}})</p>
                   </span>
                 </template>
@@ -118,7 +123,13 @@
               </el-table-column>
               <el-table-column label="Action">
                 <template slot-scope="scope">
-                  <el-button size="small" type="danger" icon="el-icon-delete" circle @click="deleteTask(scope.row.id)"></el-button>
+                  <el-dropdown @command="handlePatchStatus" split-button type="danger" @click="deleteTask(scope.row.id)">
+                    <el-dropdown-menu slot="dropdown" >
+                      Delete
+                      <el-dropdown-item :disabled="scope.row.status !== 'new'" :command="{status:'cancelled',id:scope.row.id}">Decline</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                  <!-- <el-button size="small" type="danger" icon="el-icon-delete" circle @click="deleteTask(scope.row.id)"></el-button> -->
                 </template>
               </el-table-column>
             </el-table>
@@ -252,7 +263,9 @@ export default {
       let url = '/api/v1/jobs/' + id
       this.$http.delete(url).then((response) => {
         this.fetchTasks()
-      }, (err) => {})
+      }, (err) => {
+        console.log(err)
+      })
     },
     patchStatus (status, id) {
       let url = '/api/v1/jobs/' + id + '/status'
@@ -268,12 +281,12 @@ export default {
 
       if (this.valet) {
         url = '/api/v1/valets/deliveries' +
-        '?page=' + this.tasks.pagination.page +
-        '&perPage=' + this.tasks.pagination.perPage
+          '?page=' + this.tasks.pagination.page +
+          '&perPage=' + this.tasks.pagination.perPage
       } else {
         url = '/api/v1/jobs' +
-        '?page=' + this.tasks.pagination.page +
-        '&perPage=' + this.tasks.pagination.perPage
+          '?page=' + this.tasks.pagination.page +
+          '&perPage=' + this.tasks.pagination.perPage
       }
 
       this.$http.get(url).then(
@@ -301,7 +314,6 @@ export default {
     this.manager = this.user.roles.includes('manager')
     this.valet = !this.manager
     this.fetchTasks()
-    var event = 'valet-status'
     if (this.manager) {
       this.sockets.subscribe('realtime-manager', (data) => {
         this.fetchTasks()
