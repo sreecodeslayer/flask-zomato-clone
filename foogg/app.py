@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from foogg import auth, api
 from foogg.extensions import db, jwt, socketio
 from .helpers import loadconf
@@ -7,11 +7,17 @@ from .helpers import loadconf
 def create_app(config=None, testing=False, cli=False):
     '''Application factory, used to create application
     '''
-    app = Flask('FOOGG')
+    app = Flask('FOOGG',
+                template_folder='./templates',
+                static_folder='./static')
 
     configure_app(app, testing)
     configure_extensions(app, cli)
     register_blueprints(app)
+
+    @app.route('/')
+    def index():
+        return render_template('index.html')
 
     return app
 
